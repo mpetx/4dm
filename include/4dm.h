@@ -6,5 +6,6 @@
 #define FDM_VERSION_SERIAL 1
 
 #include <4dm/vector.h>
+#include <4dm/affine.h>
 
 #endif

@@ -7,7 +7,7 @@ TEST_BIN_DIR=bin/tests
 CC=gcc
 CFLAGS=-I$(INC_DIR)
 LIBS=-lcunit
-ALL_TESTS=$(addprefix $(TEST_BIN_DIR)/, test_vector.exe)
+ALL_TESTS=$(addprefix $(TEST_BIN_DIR)/, test_vector.exe test_affine.exe)
 
 .PHONY: all
 all: $(ALL_TESTS)
