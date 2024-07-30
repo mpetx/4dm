@@ -9,6 +9,14 @@
 
 #define EPSILON 0.001
 
+#define ASSERT_VECTOR_EQUAL(vect, x, y, z, w)			\
+  {								\
+    CU_ASSERT_DOUBLE_EQUAL(x, fdm_vector_x(&vect), EPSILON);	\
+    CU_ASSERT_DOUBLE_EQUAL(y, fdm_vector_y(&vect), EPSILON);	\
+    CU_ASSERT_DOUBLE_EQUAL(z, fdm_vector_z(&vect), EPSILON);	\
+    CU_ASSERT_DOUBLE_EQUAL(w, fdm_vector_w(&vect), EPSILON);	\
+  }
+
 #define ASSERT_AFFINE_EQUAL(aff,					\
 			    xx,  xy,  xz,  xw,				\
 			    yx,  yy,  yz,  yw,				\
@@ -16,26 +24,28 @@
 			    wx,  wy,  wz,  ww,				\
 			    trans_x, trans_y,				\
 			    trans_z, trans_w)				\
-  CU_ASSERT_DOUBLE_EQUAL(xx, fdm_affine_xx(&aff), EPSILON);		\
-  CU_ASSERT_DOUBLE_EQUAL(xy, fdm_affine_xy(&aff), EPSILON);		\
-  CU_ASSERT_DOUBLE_EQUAL(xz, fdm_affine_xz(&aff), EPSILON);		\
-  CU_ASSERT_DOUBLE_EQUAL(xw, fdm_affine_xw(&aff), EPSILON);		\
-  CU_ASSERT_DOUBLE_EQUAL(yx, fdm_affine_yx(&aff), EPSILON);		\
-  CU_ASSERT_DOUBLE_EQUAL(yy, fdm_affine_yy(&aff), EPSILON);		\
-  CU_ASSERT_DOUBLE_EQUAL(yz, fdm_affine_yz(&aff), EPSILON);		\
-  CU_ASSERT_DOUBLE_EQUAL(yw, fdm_affine_yw(&aff), EPSILON);		\
-  CU_ASSERT_DOUBLE_EQUAL(zx, fdm_affine_zx(&aff), EPSILON);		\
-  CU_ASSERT_DOUBLE_EQUAL(zy, fdm_affine_zy(&aff), EPSILON);		\
-  CU_ASSERT_DOUBLE_EQUAL(zz, fdm_affine_zz(&aff), EPSILON);		\
-  CU_ASSERT_DOUBLE_EQUAL(zw, fdm_affine_zw(&aff), EPSILON);		\
-  CU_ASSERT_DOUBLE_EQUAL(wx, fdm_affine_wx(&aff), EPSILON);		\
-  CU_ASSERT_DOUBLE_EQUAL(wy, fdm_affine_wy(&aff), EPSILON);		\
-  CU_ASSERT_DOUBLE_EQUAL(wz, fdm_affine_wz(&aff), EPSILON);		\
-  CU_ASSERT_DOUBLE_EQUAL(ww, fdm_affine_ww(&aff), EPSILON);		\
-  CU_ASSERT_DOUBLE_EQUAL(trans_x, fdm_affine_trans_x(&aff), EPSILON);	\
-  CU_ASSERT_DOUBLE_EQUAL(trans_y, fdm_affine_trans_y(&aff), EPSILON);	\
-  CU_ASSERT_DOUBLE_EQUAL(trans_z, fdm_affine_trans_z(&aff), EPSILON);	\
-  CU_ASSERT_DOUBLE_EQUAL(trans_w, fdm_affine_trans_w(&aff), EPSILON);	\
+  {									\
+    CU_ASSERT_DOUBLE_EQUAL(xx, fdm_affine_xx(&aff), EPSILON);		\
+    CU_ASSERT_DOUBLE_EQUAL(xy, fdm_affine_xy(&aff), EPSILON);		\
+    CU_ASSERT_DOUBLE_EQUAL(xz, fdm_affine_xz(&aff), EPSILON);		\
+    CU_ASSERT_DOUBLE_EQUAL(xw, fdm_affine_xw(&aff), EPSILON);		\
+    CU_ASSERT_DOUBLE_EQUAL(yx, fdm_affine_yx(&aff), EPSILON);		\
+    CU_ASSERT_DOUBLE_EQUAL(yy, fdm_affine_yy(&aff), EPSILON);		\
+    CU_ASSERT_DOUBLE_EQUAL(yz, fdm_affine_yz(&aff), EPSILON);		\
+    CU_ASSERT_DOUBLE_EQUAL(yw, fdm_affine_yw(&aff), EPSILON);		\
+    CU_ASSERT_DOUBLE_EQUAL(zx, fdm_affine_zx(&aff), EPSILON);		\
+    CU_ASSERT_DOUBLE_EQUAL(zy, fdm_affine_zy(&aff), EPSILON);		\
+    CU_ASSERT_DOUBLE_EQUAL(zz, fdm_affine_zz(&aff), EPSILON);		\
+    CU_ASSERT_DOUBLE_EQUAL(zw, fdm_affine_zw(&aff), EPSILON);		\
+    CU_ASSERT_DOUBLE_EQUAL(wx, fdm_affine_wx(&aff), EPSILON);		\
+    CU_ASSERT_DOUBLE_EQUAL(wy, fdm_affine_wy(&aff), EPSILON);		\
+    CU_ASSERT_DOUBLE_EQUAL(wz, fdm_affine_wz(&aff), EPSILON);		\
+    CU_ASSERT_DOUBLE_EQUAL(ww, fdm_affine_ww(&aff), EPSILON);		\
+    CU_ASSERT_DOUBLE_EQUAL(trans_x, fdm_affine_trans_x(&aff), EPSILON);	\
+    CU_ASSERT_DOUBLE_EQUAL(trans_y, fdm_affine_trans_y(&aff), EPSILON);	\
+    CU_ASSERT_DOUBLE_EQUAL(trans_z, fdm_affine_trans_z(&aff), EPSILON);	\
+    CU_ASSERT_DOUBLE_EQUAL(trans_w, fdm_affine_trans_w(&aff), EPSILON);	\
+  }
 
 
 void fdm_affine_ctor_test(void)
@@ -126,10 +136,7 @@ void fdm_affine_str_test(void)
   fdm_vector vect = fdm_create_vector(-98, -73, -78, -24);
 
   fdm_vector result = fdm_affine_apply(&aff, &vect);
-  CU_ASSERT_DOUBLE_EQUAL(3306, fdm_vector_x(&result), EPSILON);
-  CU_ASSERT_DOUBLE_EQUAL(-6609, fdm_vector_y(&result), EPSILON);
-  CU_ASSERT_DOUBLE_EQUAL(-11216, fdm_vector_z(&result), EPSILON);
-  CU_ASSERT_DOUBLE_EQUAL(-12252, fdm_vector_w(&result), EPSILON);
+  ASSERT_VECTOR_EQUAL(result, 3306, -6609, -11216, -12252);
 
   fdm_affine aresult = fdm_affine_concat(&aff, &aff2);
   ASSERT_AFFINE_EQUAL(aresult,

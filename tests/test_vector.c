@@ -9,22 +9,24 @@
 
 #define EPSILON 0.001
 
+#define ASSERT_VECTOR_EQUAL(vect, x, y, z, w)			\
+  {								\
+    CU_ASSERT_DOUBLE_EQUAL(x, fdm_vector_x(&vect), EPSILON);	\
+    CU_ASSERT_DOUBLE_EQUAL(y, fdm_vector_y(&vect), EPSILON);	\
+    CU_ASSERT_DOUBLE_EQUAL(z, fdm_vector_z(&vect), EPSILON);	\
+    CU_ASSERT_DOUBLE_EQUAL(w, fdm_vector_w(&vect), EPSILON);	\
+  }
+
 void fdm_vector_basic_test(void)
 {
   fdm_vector vect = fdm_create_vector(-51, 93, 29, 84);
-  CU_ASSERT_DOUBLE_EQUAL(-51, fdm_vector_x(&vect), EPSILON);
-  CU_ASSERT_DOUBLE_EQUAL(93, fdm_vector_y(&vect), EPSILON);
-  CU_ASSERT_DOUBLE_EQUAL(29, fdm_vector_z(&vect), EPSILON);
-  CU_ASSERT_DOUBLE_EQUAL(84, fdm_vector_w(&vect), EPSILON);
+  ASSERT_VECTOR_EQUAL(vect, -51, 93, 29, 84);
 
   fdm_vector_set_x(&vect, 32);
   fdm_vector_set_y(&vect, 37);
   fdm_vector_set_z(&vect, -14);
   fdm_vector_set_w(&vect, -82);
-  CU_ASSERT_DOUBLE_EQUAL(32, fdm_vector_x(&vect), EPSILON);
-  CU_ASSERT_DOUBLE_EQUAL(37, fdm_vector_y(&vect), EPSILON);
-  CU_ASSERT_DOUBLE_EQUAL(-14, fdm_vector_z(&vect), EPSILON);
-  CU_ASSERT_DOUBLE_EQUAL(-82, fdm_vector_w(&vect), EPSILON);
+  ASSERT_VECTOR_EQUAL(vect, 32, 37, -14, -82);
 }
 
 void fdm_vector_arith_test(void)
@@ -34,28 +36,16 @@ void fdm_vector_arith_test(void)
   fdm_vector result;
 
   result = fdm_vector_add(&vect1, &vect2);
-  CU_ASSERT_DOUBLE_EQUAL(-6, fdm_vector_x(&result), EPSILON);
-  CU_ASSERT_DOUBLE_EQUAL(-163, fdm_vector_y(&result), EPSILON);
-  CU_ASSERT_DOUBLE_EQUAL(98, fdm_vector_z(&result), EPSILON);
-  CU_ASSERT_DOUBLE_EQUAL(26, fdm_vector_w(&result), EPSILON);
+  ASSERT_VECTOR_EQUAL(result, -6, -163, 98, 26)
 
   result = fdm_vector_subtract(&vect1, &vect2);
-  CU_ASSERT_DOUBLE_EQUAL(64, fdm_vector_x(&result), EPSILON);
-  CU_ASSERT_DOUBLE_EQUAL(-23, fdm_vector_y(&result), EPSILON);
-  CU_ASSERT_DOUBLE_EQUAL(36, fdm_vector_z(&result), EPSILON);
-  CU_ASSERT_DOUBLE_EQUAL(2, fdm_vector_w(&result), EPSILON);
+  ASSERT_VECTOR_EQUAL(result, 64, -23, 36, 2);
 
   result = fdm_vector_multiply(&vect1, 75);
-  CU_ASSERT_DOUBLE_EQUAL(2175, fdm_vector_x(&result), EPSILON);
-  CU_ASSERT_DOUBLE_EQUAL(-6975, fdm_vector_y(&result), EPSILON);
-  CU_ASSERT_DOUBLE_EQUAL(5025, fdm_vector_z(&result), EPSILON);
-  CU_ASSERT_DOUBLE_EQUAL(1050, fdm_vector_w(&result), EPSILON);
+  ASSERT_VECTOR_EQUAL(result, 2175, -6975, 5025, 1050);
 
   result = fdm_vector_combine(-8, &vect1, 9, &vect2);
-  CU_ASSERT_DOUBLE_EQUAL(-547, fdm_vector_x(&result), EPSILON);
-  CU_ASSERT_DOUBLE_EQUAL(114, fdm_vector_y(&result), EPSILON);
-  CU_ASSERT_DOUBLE_EQUAL(-257, fdm_vector_z(&result), EPSILON);
-  CU_ASSERT_DOUBLE_EQUAL(-4, fdm_vector_w(&result), EPSILON);
+  ASSERT_VECTOR_EQUAL(result, -547, 114, -257, -4);
 }
 
 void fdm_vector_topo_test(void)
@@ -77,16 +67,10 @@ void fdm_vector_topo_test(void)
   CU_ASSERT_DOUBLE_EQUAL(105.0714043, sresult, EPSILON);
 
   vresult = fdm_vector_normalize(&vect1);
-  CU_ASSERT_DOUBLE_EQUAL(0.6091095, fdm_vector_x(&vresult), EPSILON);
-  CU_ASSERT_DOUBLE_EQUAL(-0.7233176, fdm_vector_y(&vresult), EPSILON);
-  CU_ASSERT_DOUBLE_EQUAL(-0.1142080, fdm_vector_z(&vresult), EPSILON);
-  CU_ASSERT_DOUBLE_EQUAL(0.3045547, fdm_vector_w(&vresult), EPSILON);
+  ASSERT_VECTOR_EQUAL(vresult, 0.6091095, -0.7233176, -0.1142080, 0.3045547);
 
   vresult = fdm_vector_cross(&vect1, &vect2, &vect3);
-  CU_ASSERT_DOUBLE_EQUAL(533776, fdm_vector_x(&vresult), EPSILON);
-  CU_ASSERT_DOUBLE_EQUAL(212960, fdm_vector_y(&vresult), EPSILON);
-  CU_ASSERT_DOUBLE_EQUAL(-326240, fdm_vector_z(&vresult), EPSILON);
-  CU_ASSERT_DOUBLE_EQUAL(-684112, fdm_vector_w(&vresult), EPSILON);
+  ASSERT_VECTOR_EQUAL(vresult, 533776, 212960, -326240, -684112);
   CU_ASSERT_DOUBLE_EQUAL(0, fdm_vector_dot(&vect1, &vresult), EPSILON);
   CU_ASSERT_DOUBLE_EQUAL(0, fdm_vector_dot(&vect2, &vresult), EPSILON);
   CU_ASSERT_DOUBLE_EQUAL(0, fdm_vector_dot(&vect3, &vresult), EPSILON);

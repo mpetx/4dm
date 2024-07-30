@@ -9,80 +9,51 @@ typedef struct
   float trans[4];
 } fdm_affine;
 
-#define FDM_PVT_DEFINE_AFFINE_MATRIX_READER(name, i, j) \
-  static inline float name(fdm_affine const * aff)	\
-  {							\
-    return aff->mat[i][j];				\
-  }
-
-#define FDM_PVT_DEFINE_AFFINE_MATRIX_WRITER(name, i, j)			\
-  static inline void name(fdm_affine * aff, float new_value)		\
+#define FDM_PVT_DEFINE_AFFINE_MATRIX_ACCESSOR(reader_name, writer_name, i, j) \
+  static inline float reader_name(fdm_affine const * aff)		\
   {									\
-    aff->mat[i][j] = new_value;						\
+    return aff->mat[i][j];						\
+  }									\
+  static inline void writer_name(fdm_affine * aff, float new_value)	\
+  {									\
+    aff->mat[i][j] = new_value ;					\
   }
 
-FDM_PVT_DEFINE_AFFINE_MATRIX_READER(fdm_affine_xx, 0, 0)
-FDM_PVT_DEFINE_AFFINE_MATRIX_WRITER(fdm_affine_set_xx, 0, 0)
-FDM_PVT_DEFINE_AFFINE_MATRIX_READER(fdm_affine_xy, 0, 1)
-FDM_PVT_DEFINE_AFFINE_MATRIX_WRITER(fdm_affine_set_xy, 0, 1)
-FDM_PVT_DEFINE_AFFINE_MATRIX_READER(fdm_affine_xz, 0, 2)
-FDM_PVT_DEFINE_AFFINE_MATRIX_WRITER(fdm_affine_set_xz, 0, 2)
-FDM_PVT_DEFINE_AFFINE_MATRIX_READER(fdm_affine_xw, 0, 3)
-FDM_PVT_DEFINE_AFFINE_MATRIX_WRITER(fdm_affine_set_xw, 0, 3)
-  
-FDM_PVT_DEFINE_AFFINE_MATRIX_READER(fdm_affine_yx, 1, 0)
-FDM_PVT_DEFINE_AFFINE_MATRIX_WRITER(fdm_affine_set_yx, 1, 0)
-FDM_PVT_DEFINE_AFFINE_MATRIX_READER(fdm_affine_yy, 1, 1)
-FDM_PVT_DEFINE_AFFINE_MATRIX_WRITER(fdm_affine_set_yy, 1, 1)
-FDM_PVT_DEFINE_AFFINE_MATRIX_READER(fdm_affine_yz, 1, 2)
-FDM_PVT_DEFINE_AFFINE_MATRIX_WRITER(fdm_affine_set_yz, 1, 2)
-FDM_PVT_DEFINE_AFFINE_MATRIX_READER(fdm_affine_yw, 1, 3)
-FDM_PVT_DEFINE_AFFINE_MATRIX_WRITER(fdm_affine_set_yw, 1, 3)
-  
-FDM_PVT_DEFINE_AFFINE_MATRIX_READER(fdm_affine_zx, 2, 0)
-FDM_PVT_DEFINE_AFFINE_MATRIX_WRITER(fdm_affine_set_zx, 2, 0)
-FDM_PVT_DEFINE_AFFINE_MATRIX_READER(fdm_affine_zy, 2, 1)
-FDM_PVT_DEFINE_AFFINE_MATRIX_WRITER(fdm_affine_set_zy, 2, 1)
-FDM_PVT_DEFINE_AFFINE_MATRIX_READER(fdm_affine_zz, 2, 2)
-FDM_PVT_DEFINE_AFFINE_MATRIX_WRITER(fdm_affine_set_zz, 2, 2)
-FDM_PVT_DEFINE_AFFINE_MATRIX_READER(fdm_affine_zw, 2, 3)
-FDM_PVT_DEFINE_AFFINE_MATRIX_WRITER(fdm_affine_set_zw, 2, 3)
-  
-FDM_PVT_DEFINE_AFFINE_MATRIX_READER(fdm_affine_wx, 3, 0)
-FDM_PVT_DEFINE_AFFINE_MATRIX_WRITER(fdm_affine_set_wx, 3, 0)
-FDM_PVT_DEFINE_AFFINE_MATRIX_READER(fdm_affine_wy, 3, 1)
-FDM_PVT_DEFINE_AFFINE_MATRIX_WRITER(fdm_affine_set_wy, 3, 1)
-FDM_PVT_DEFINE_AFFINE_MATRIX_READER(fdm_affine_wz, 3, 2)
-FDM_PVT_DEFINE_AFFINE_MATRIX_WRITER(fdm_affine_set_wz, 3, 2)
-FDM_PVT_DEFINE_AFFINE_MATRIX_READER(fdm_affine_ww, 3, 3)
-FDM_PVT_DEFINE_AFFINE_MATRIX_WRITER(fdm_affine_set_ww, 3, 3)
+FDM_PVT_DEFINE_AFFINE_MATRIX_ACCESSOR(fdm_affine_xx, fdm_affine_set_xx, 0, 0)
+FDM_PVT_DEFINE_AFFINE_MATRIX_ACCESSOR(fdm_affine_xy, fdm_affine_set_xy, 0, 1)
+FDM_PVT_DEFINE_AFFINE_MATRIX_ACCESSOR(fdm_affine_xz, fdm_affine_set_xz, 0, 2)
+FDM_PVT_DEFINE_AFFINE_MATRIX_ACCESSOR(fdm_affine_xw, fdm_affine_set_xw, 0, 3)
+FDM_PVT_DEFINE_AFFINE_MATRIX_ACCESSOR(fdm_affine_yx, fdm_affine_set_yx, 1, 0)
+FDM_PVT_DEFINE_AFFINE_MATRIX_ACCESSOR(fdm_affine_yy, fdm_affine_set_yy, 1, 1)
+FDM_PVT_DEFINE_AFFINE_MATRIX_ACCESSOR(fdm_affine_yz, fdm_affine_set_yz, 1, 2)
+FDM_PVT_DEFINE_AFFINE_MATRIX_ACCESSOR(fdm_affine_yw, fdm_affine_set_yw, 1, 3)
+FDM_PVT_DEFINE_AFFINE_MATRIX_ACCESSOR(fdm_affine_zx, fdm_affine_set_zx, 2, 0)
+FDM_PVT_DEFINE_AFFINE_MATRIX_ACCESSOR(fdm_affine_zy, fdm_affine_set_zy, 2, 1)
+FDM_PVT_DEFINE_AFFINE_MATRIX_ACCESSOR(fdm_affine_zz, fdm_affine_set_zz, 2, 2)
+FDM_PVT_DEFINE_AFFINE_MATRIX_ACCESSOR(fdm_affine_zw, fdm_affine_set_zw, 2, 3)
+FDM_PVT_DEFINE_AFFINE_MATRIX_ACCESSOR(fdm_affine_wx, fdm_affine_set_wx, 3, 0)
+FDM_PVT_DEFINE_AFFINE_MATRIX_ACCESSOR(fdm_affine_wy, fdm_affine_set_wy, 3, 1)
+FDM_PVT_DEFINE_AFFINE_MATRIX_ACCESSOR(fdm_affine_wz, fdm_affine_set_wz, 3, 2)
+FDM_PVT_DEFINE_AFFINE_MATRIX_ACCESSOR(fdm_affine_ww, fdm_affine_set_ww, 3, 3)
 
-#undef FDM_PVT_DEFINE_AFFINE_MATRIX_READER
-#undef FDM_PVT_DEFINE_AFFINE_MATRIX_WRITER
+#undef FDM_PVT_DEFINE_AFFINE_MATRIX_ACCESSOR
 
-#define FDM_PVT_DEFINE_AFFINE_TRANS_READER(name, i)	\
-  static inline float name(fdm_affine const * aff)	\
-  {							\
-    return aff->trans[i];				\
+#define FDM_PVT_DEFINE_AFFINE_TRANS_ACCESSOR(reader_name, writer_name, i) \
+  static inline float reader_name(fdm_affine const * aff)		\
+  {									\
+    return aff->trans[i];						\
+  }									\
+  static inline void writer_name(fdm_affine * aff, float new_value)	\
+  {									\
+    aff->trans[i] = new_value;						\
   }
 
-#define FDM_PVT_DEFINE_AFFINE_TRANS_WRITER(name, i)		\
-  static inline void name(fdm_affine * aff, float new_value)	\
-  {								\
-    aff->trans[i] = new_value;					\
-  }
+FDM_PVT_DEFINE_AFFINE_TRANS_ACCESSOR(fdm_affine_trans_x, fdm_affine_set_trans_x, 0)
+FDM_PVT_DEFINE_AFFINE_TRANS_ACCESSOR(fdm_affine_trans_y, fdm_affine_set_trans_y, 1)
+FDM_PVT_DEFINE_AFFINE_TRANS_ACCESSOR(fdm_affine_trans_z, fdm_affine_set_trans_z, 2)
+FDM_PVT_DEFINE_AFFINE_TRANS_ACCESSOR(fdm_affine_trans_w, fdm_affine_set_trans_w, 3)
 
-FDM_PVT_DEFINE_AFFINE_TRANS_READER(fdm_affine_trans_x, 0)
-FDM_PVT_DEFINE_AFFINE_TRANS_WRITER(fdm_affine_set_trans_x, 0)
-FDM_PVT_DEFINE_AFFINE_TRANS_READER(fdm_affine_trans_y, 1)
-FDM_PVT_DEFINE_AFFINE_TRANS_WRITER(fdm_affine_set_trans_y, 1)
-FDM_PVT_DEFINE_AFFINE_TRANS_READER(fdm_affine_trans_z, 2)
-FDM_PVT_DEFINE_AFFINE_TRANS_WRITER(fdm_affine_set_trans_z, 2)
-FDM_PVT_DEFINE_AFFINE_TRANS_READER(fdm_affine_trans_w, 3)
-FDM_PVT_DEFINE_AFFINE_TRANS_WRITER(fdm_affine_set_trans_w, 3)
-
-#undef FDM_PVT_DEFINE_AFFINE_TRANS_READER
-#undef FDM_PVT_DEFINE_AFFINE_TRANS_WRITER
+#undef FDM_PVT_DEFINE_AFFINE_TRANS_ACCESSOR
 
 static inline fdm_affine fdm_create_matrix(float xx, float xy, float xz, float xw,
 					   float yx, float yy, float yz, float yw,

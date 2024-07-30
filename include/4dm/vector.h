@@ -17,30 +17,22 @@ static inline fdm_vector fdm_create_vector(float x, float y, float z, float w)
   };
 }
 
-#define FDM_PVT_DEFINE_VECTOR_READER(name, offset)    \
-  static inline float name(fdm_vector const * vect)   \
-  {						      \
-    return vect->data[offset];			      \
+#define FDM_PVT_DEFINE_VECTOR_ACCESSOR(reader_name, writer_name, offset) \
+  static inline float reader_name(fdm_vector const * vect)		\
+  {									\
+    return vect->data[offset];						\
+  }									\
+  static inline void writer_name(fdm_vector * vect, float new_value)	\
+  {									\
+    vect->data[offset] = new_value;					\
   }
 
-#define FDM_PVT_DEFINE_VECTOR_WRITER(name, offset)		\
-  static inline float name(fdm_vector * vect, float new_value)	\
-  {								\
-    vect->data[offset] = new_value;				\
-    return new_value;						\
-  }
+FDM_PVT_DEFINE_VECTOR_ACCESSOR(fdm_vector_x, fdm_vector_set_x, 0)
+FDM_PVT_DEFINE_VECTOR_ACCESSOR(fdm_vector_y, fdm_vector_set_y, 1)
+FDM_PVT_DEFINE_VECTOR_ACCESSOR(fdm_vector_z, fdm_vector_set_z, 2)
+FDM_PVT_DEFINE_VECTOR_ACCESSOR(fdm_vector_w, fdm_vector_set_w, 3)
 
-FDM_PVT_DEFINE_VECTOR_READER(fdm_vector_x, 0)
-FDM_PVT_DEFINE_VECTOR_WRITER(fdm_vector_set_x, 0)
-FDM_PVT_DEFINE_VECTOR_READER(fdm_vector_y, 1)
-FDM_PVT_DEFINE_VECTOR_WRITER(fdm_vector_set_y, 1)
-FDM_PVT_DEFINE_VECTOR_READER(fdm_vector_z, 2)
-FDM_PVT_DEFINE_VECTOR_WRITER(fdm_vector_set_z, 2)
-FDM_PVT_DEFINE_VECTOR_READER(fdm_vector_w, 3)
-FDM_PVT_DEFINE_VECTOR_WRITER(fdm_vector_set_w, 3)
-
-#undef FDM_PVT_DEFINE_VECTOR_READER
-#undef FDM_PVT_DEFINE_VECTOR_WRITER
+#undef FDM_PVT_DEFINE_VECTOR_ACCESSOR
 
 #define FDM_PVT_DEFINE_VECTOR_BINARY_ARITHMETIC(name, op)		\
   static inline fdm_vector name(fdm_vector const * lhs, fdm_vector const * rhs) \
