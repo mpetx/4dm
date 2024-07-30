@@ -7,5 +7,6 @@
 
 #include <4dm/vector.h>
 #include <4dm/affine.h>
+#include <4dm/util.h>
 
 #endif

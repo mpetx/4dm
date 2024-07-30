@@ -2,6 +2,7 @@
 #define FDM_4DM_AFFINE_H_2024_07_29_8D1A31FE_3A11_4C16_A5AA_6129EBFAB720
 
 #include <stddef.h>
+#include <math.h>
 
 typedef struct
 {
@@ -125,6 +126,67 @@ static inline fdm_affine fdm_affine_concat(fdm_affine const * aff1, fdm_affine c
       result.trans[i] += aff2->mat[i][k] * aff1->trans[k];
     result.trans[i] += aff2->trans[i];
   }
+  return result;
+}
+
+static inline fdm_affine fdm_create_rotate(float rad, fdm_vector const * vect1, fdm_vector const * vect2)
+{
+  // <u1,u2> = <vect1,vect2> を満たす正規直交基底u1~u4を見つける
+  fdm_vector u1 = fdm_vector_normalize(vect1);
+  fdm_vector u2 = *vect2;
+  fdm_vector as[4] = {
+    fdm_create_vector(1, 0, 0, 0),
+    fdm_create_vector(0, 1, 0, 0),
+    fdm_create_vector(0, 0, 1, 0),
+    fdm_create_vector(0, 0, 0, 1)
+  };
+  u2 = fdm_vector_combine(1, &u2, -fdm_vector_dot(&u1, &u2), &u1);
+  for (size_t i = 0; i < 4; ++i)
+    as[i] = fdm_vector_combine(1, as+i, -fdm_vector_dot(&u1, as+i), &u1);
+  u2 = fdm_vector_normalize(&u2);
+  for (size_t i = 0; i < 4; ++i)
+    as[i] = fdm_vector_combine(1, as+i, -fdm_vector_dot(&u2, as+i), &u2);
+  float max_norm = fdm_vector_norm_2(as);
+  size_t max_ind = 0;
+  for (size_t i = 1; i < 4; ++i) {
+    float norm = fdm_vector_norm_2(as+i);
+    if (norm > max_norm) {
+      max_norm = norm;
+      max_ind = i;
+    }
+  }
+  fdm_vector u3 = fdm_vector_normalize(as+max_ind);
+  as[max_ind] = as[3];
+  for (size_t i = 0; i < 3; ++i)
+    as[i] = fdm_vector_combine(1, as+i, -fdm_vector_dot(&u3, as+i), &u3);
+  max_norm = fdm_vector_norm_2(as);
+  max_ind = 0;
+  for (size_t i = 1; i < 3; ++i) {
+    float norm = fdm_vector_norm_2(as+i);
+    if (norm > max_norm) {
+      max_norm = norm;
+      max_ind = i;
+    }
+  }
+  fdm_vector u4 = fdm_vector_normalize(as+max_ind);
+
+  fdm_affine basis_change = fdm_create_matrix
+    (fdm_vector_x(&u1), fdm_vector_y(&u1), fdm_vector_z(&u1), fdm_vector_w(&u1),
+     fdm_vector_x(&u2), fdm_vector_y(&u2), fdm_vector_z(&u2), fdm_vector_w(&u2),
+     fdm_vector_x(&u3), fdm_vector_y(&u3), fdm_vector_z(&u3), fdm_vector_w(&u3),
+     fdm_vector_x(&u4), fdm_vector_y(&u4), fdm_vector_z(&u4), fdm_vector_w(&u4));
+  fdm_affine rotate = fdm_create_matrix
+    (cosf(rad), -sinf(rad), 0, 0,
+     sinf(rad), cos(rad), 0, 0,
+     0, 0, 1, 0,
+     0, 0, 0, 1);
+  fdm_affine basis_dischange = fdm_create_matrix
+    (fdm_vector_x(&u1), fdm_vector_x(&u2), fdm_vector_x(&u3), fdm_vector_x(&u4),
+     fdm_vector_y(&u1), fdm_vector_y(&u2), fdm_vector_y(&u3), fdm_vector_y(&u4),
+     fdm_vector_z(&u1), fdm_vector_z(&u2), fdm_vector_z(&u3), fdm_vector_z(&u4),
+     fdm_vector_w(&u1), fdm_vector_w(&u2), fdm_vector_w(&u3), fdm_vector_w(&u4));
+  fdm_affine result = fdm_affine_concat(&basis_change, &rotate);
+  result = fdm_affine_concat(&result, &basis_dischange);
   return result;
 }
 

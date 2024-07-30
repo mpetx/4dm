@@ -147,6 +147,50 @@ void fdm_affine_str_test(void)
 		      -193, 596, 784, -485);
 }
 
+void fdm_affine_rot_test(void)
+{
+  fdm_vector ex = fdm_create_vector(1, 0, 0, 0);
+  fdm_vector ey = fdm_create_vector(0, 1, 0, 0);
+  fdm_vector ez = fdm_create_vector(0, 0, 1, 0);
+  fdm_vector ew = fdm_create_vector(0, 0, 0, 1);
+  fdm_affine rot;
+  fdm_vector result, temp1, temp2;
+
+  temp1 = fdm_create_vector(9, 0, 0, 0);
+  temp2 = fdm_create_vector(-7, 4, 0, 0);
+  rot = fdm_create_rotate(FDM_PI / 3, &temp1, &temp2);
+  result = fdm_affine_apply(&rot, &ex);
+  ASSERT_VECTOR_EQUAL(result, 0.5, 0.866025404, 0, 0);
+  result = fdm_affine_apply(&rot, &ey);
+  ASSERT_VECTOR_EQUAL(result, -0.866025404, 0.5, 0, 0);
+  result = fdm_affine_apply(&rot, &ez);
+  ASSERT_VECTOR_EQUAL(result, 0, 0, 1, 0);
+  result = fdm_affine_apply(&rot, &ew);
+  ASSERT_VECTOR_EQUAL(result, 0, 0, 0, 1);
+
+  rot = fdm_create_rotate(FDM_PI / 3, &temp2, &temp1);
+  result = fdm_affine_apply(&rot, &ex);
+  ASSERT_VECTOR_EQUAL(result, 0.5, -0.866025404, 0, 0);
+  result = fdm_affine_apply(&rot, &ey);
+  ASSERT_VECTOR_EQUAL(result, 0.866025404, 0.5, 0, 0);
+  result = fdm_affine_apply(&rot, &ez);
+  ASSERT_VECTOR_EQUAL(result, 0, 0, 1, 0);
+  result = fdm_affine_apply(&rot, &ew);
+  ASSERT_VECTOR_EQUAL(result, 0, 0, 0, 1);
+
+  temp1 = fdm_create_vector(0, 0, 4, 10);
+  temp2 = fdm_create_vector(0, 0, -7, 3);
+  rot = fdm_create_rotate(acosf(4.0 / 5), &temp1, &temp2);
+  result = fdm_affine_apply(&rot, &ex);
+  ASSERT_VECTOR_EQUAL(result, 1, 0, 0, 0);
+  result = fdm_affine_apply(&rot, &ey);
+  ASSERT_VECTOR_EQUAL(result, 0, 1, 0, 0);
+  result = fdm_affine_apply(&rot, &ez);
+  ASSERT_VECTOR_EQUAL(result, 0, 0, 4.0 / 5, 3.0 / 5);
+  result = fdm_affine_apply(&rot, &ew);
+  ASSERT_VECTOR_EQUAL(result, 0, 0, -3.0 / 5, 4.0 / 5);
+}
+
 int main(void)
 {
   CU_initialize_registry();
@@ -154,6 +198,7 @@ int main(void)
   CU_pSuite suite = CU_add_suite("fdm_affine test", NULL, NULL);
   CU_add_test(suite, "fdm_affine ctor test", fdm_affine_ctor_test);
   CU_add_test(suite, "fdm_affine str test", fdm_affine_str_test);
+  CU_add_test(suite, "fdm_affine rot test", fdm_affine_rot_test);
   
   CU_console_run_tests();
   CU_cleanup_registry();
