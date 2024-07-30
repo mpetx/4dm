@@ -85,7 +85,7 @@ fdm_affine fdm_create_scale(float x, float y, float z, float w);
 fdm_affine fdm_create_rotate(float rad, fdm_vector const * vect1, fdm_vector const * vect2);
 ```
 
-回転変換を表すアフィン変換を作成します。`vect1`と`vect2`が成す平面$S$を`vect1`から`vect2`の方向に`rad`ラジアンだけ回転させます。原点を通る$S$と直交する平面は変化しません。
+回転変換を表すアフィン変換を作成します。`vect1`と`vect2`が成す平面 $S$ を`vect1`から`vect2`の方向に`rad`ラジアンだけ回転させます。原点を通り $S$ と直交する平面は変化しません。
 
 ## 関数 `fdm_affine_apply`
 ```c
@@ -99,7 +99,7 @@ fdm_vector fdm_affine_apply(fdm_affine const * aff, fdm_vector const * vect);
 fdm_affine fdm_affine_concat(fdm_affine const * aff1, fdm_affine const * aff2)
 ```
 
-アフィン変換の合成を計算します。`aff1`が先であることに注意してください。つまり、この関数の返り値は合成演算子$\circ$を使って
+アフィン変換の合成を計算します。`aff1`が先であることに注意してください。つまり、この関数の返り値は合成演算子 $\circ$ を使って
 
 ```math
  \mathrm{Aff}_2 \circ \mathrm{Aff}_1
