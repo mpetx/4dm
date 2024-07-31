@@ -184,7 +184,7 @@ static inline void fdm_pvt_extend_basis_2
   }
 }
 
-static inline fdm_affine fdm_create_rotate(float rad, fdm_vector const * vect1, fdm_vector const * vect2)
+static inline fdm_affine fdm_create_double_rotate(float rad1, float rad2, fdm_vector const * vect1, fdm_vector const * vect2)
 {
   fdm_vector u1, u2, u3, u4;
   fdm_pvt_gram_schmidt_2(&u1, &u2, vect1, vect2);
@@ -196,10 +196,10 @@ static inline fdm_affine fdm_create_rotate(float rad, fdm_vector const * vect1, 
      fdm_vector_x(&u3), fdm_vector_y(&u3), fdm_vector_z(&u3), fdm_vector_w(&u3),
      fdm_vector_x(&u4), fdm_vector_y(&u4), fdm_vector_z(&u4), fdm_vector_w(&u4));
   fdm_affine rotate = fdm_create_matrix
-    (cosf(rad), -sinf(rad), 0, 0,
-     sinf(rad), cos(rad), 0, 0,
-     0, 0, 1, 0,
-     0, 0, 0, 1);
+    (cosf(rad1), -sinf(rad1), 0, 0,
+     sinf(rad1), cosf(rad1), 0, 0,
+     0, 0, cosf(rad2), -sinf(rad2),
+     0, 0, sinf(rad2), cosf(rad2));
   fdm_affine basis_unchange = fdm_create_matrix
     (fdm_vector_x(&u1), fdm_vector_x(&u2), fdm_vector_x(&u3), fdm_vector_x(&u4),
      fdm_vector_y(&u1), fdm_vector_y(&u2), fdm_vector_y(&u3), fdm_vector_y(&u4),
@@ -208,6 +208,11 @@ static inline fdm_affine fdm_create_rotate(float rad, fdm_vector const * vect1, 
   fdm_affine result = fdm_affine_concat(&basis_change, &rotate);
   result = fdm_affine_concat(&result, &basis_unchange);
   return result;
+}
+
+static inline fdm_affine fdm_create_rotate(float rad, fdm_vector const * vect1, fdm_vector const * vect2)
+{
+  return fdm_create_double_rotate(rad, 0, vect1, vect2);
 }
 
 #endif

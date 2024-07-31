@@ -83,9 +83,12 @@ fdm_affine fdm_create_scale(float x, float y, float z, float w);
 ## 関数 `fdm_create_rotate`
 ```c
 fdm_affine fdm_create_rotate(float rad, fdm_vector const * vect1, fdm_vector const * vect2);
+fdm_affine fdm_create_double_rotate(float rad1, float rad2, fdm_vector const * vect1, fdm_vector const * vect2);
 ```
 
-回転変換を表すアフィン変換を作成します。`vect1`と`vect2`が成す平面 $S$ を`vect1`から`vect2`の方向に`rad`ラジアンだけ回転させます。原点を通り $S$ と直交する平面は変化しません。
+回転変換を表すアフィン変換を作成します。
+
+`fdm_create_rotate`は`vect1`と`vect2`が成す平面 $S$ を`vect1`から`vect2`の方向に`rad`ラジアンだけ回転させます。`fdm_create_double_rotate`はさらに平面 $S$ と垂直な平面 $T$ を`rad2`ラジアン回転させます。回転の方向は $S \wedge T$ が正の向きとなるように選ばれます。
 
 ## 関数 `fdm_affine_apply`
 ```c

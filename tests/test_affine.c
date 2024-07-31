@@ -189,6 +189,16 @@ void fdm_affine_rot_test(void)
   ASSERT_VECTOR_EQUAL(result, 0, 0, 4.0 / 5, 3.0 / 5);
   result = fdm_affine_apply(&rot, &ew);
   ASSERT_VECTOR_EQUAL(result, 0, 0, -3.0 / 5, 4.0 / 5);
+
+  rot = fdm_create_double_rotate(FDM_PI / 3, FDM_PI / 6, &ex, &ey);
+  result = fdm_affine_apply(&rot, &ex);
+  ASSERT_VECTOR_EQUAL(result, 0.5, 0.866025404, 0, 0);
+  result = fdm_affine_apply(&rot, &ey);
+  ASSERT_VECTOR_EQUAL(result, -0.866025404, 0.5, 0, 0);
+  result = fdm_affine_apply(&rot, &ez);
+  ASSERT_VECTOR_EQUAL(result, 0, 0, 0.866025404, 0.5);
+  result = fdm_affine_apply(&rot, &ew);
+  ASSERT_VECTOR_EQUAL(result, 0, 0,-0.5, 0.866025404);
 }
 
 int main(void)
