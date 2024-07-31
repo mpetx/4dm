@@ -129,46 +129,66 @@ static inline fdm_affine fdm_affine_concat(fdm_affine const * aff1, fdm_affine c
   return result;
 }
 
-static inline fdm_affine fdm_create_rotate(float rad, fdm_vector const * vect1, fdm_vector const * vect2)
+static inline void fdm_pvt_gram_schmidt_2
+(fdm_vector * out1, fdm_vector * out2,
+ fdm_vector const * vect1, fdm_vector const * vect2)
 {
-  // <u1,u2> = <vect1,vect2> を満たす正規直交基底u1~u4を見つける
-  fdm_vector u1 = fdm_vector_normalize(vect1);
-  fdm_vector u2 = *vect2;
-  fdm_vector as[4] = {
+  *out1 = fdm_vector_normalize(vect1);
+  *out2 = fdm_vector_combine(1, vect2, -fdm_vector_dot(out1, vect2), out1);
+  *out2 = fdm_vector_normalize(out2);
+}
+
+static inline size_t fdm_pvt_longest_vector(fdm_vector const * vs, size_t count)
+{
+  size_t max_i = 0;
+  float max_norm = fdm_vector_norm_2(vs);
+  for (size_t i = 1; i < count; ++i) {
+    float norm = fdm_vector_norm_2(vs + i);
+    if (norm > max_norm) {
+      max_i = i;
+      max_norm = norm;
+    }
+  }
+  return max_i;
+}
+
+static inline void fdm_pvt_extend_basis_2
+(fdm_vector * out3, fdm_vector * out4,
+ fdm_vector const * u1, fdm_vector const * u2)
+{
+  fdm_vector vs[4] = {
     fdm_create_vector(1, 0, 0, 0),
     fdm_create_vector(0, 1, 0, 0),
     fdm_create_vector(0, 0, 1, 0),
     fdm_create_vector(0, 0, 0, 1)
   };
-  u2 = fdm_vector_combine(1, &u2, -fdm_vector_dot(&u1, &u2), &u1);
-  for (size_t i = 0; i < 4; ++i)
-    as[i] = fdm_vector_combine(1, as+i, -fdm_vector_dot(&u1, as+i), &u1);
-  u2 = fdm_vector_normalize(&u2);
-  for (size_t i = 0; i < 4; ++i)
-    as[i] = fdm_vector_combine(1, as+i, -fdm_vector_dot(&u2, as+i), &u2);
-  float max_norm = fdm_vector_norm_2(as);
-  size_t max_ind = 0;
-  for (size_t i = 1; i < 4; ++i) {
-    float norm = fdm_vector_norm_2(as+i);
-    if (norm > max_norm) {
-      max_norm = norm;
-      max_ind = i;
-    }
+  for (size_t i = 0; i < 4; ++i) {
+    vs[i] = fdm_vector_combine(1, vs + i, -fdm_vector_dot(u1, vs + i), u1);
+    vs[i] = fdm_vector_combine(1, vs + i, -fdm_vector_dot(u2, vs + i), u2);
   }
-  fdm_vector u3 = fdm_vector_normalize(as+max_ind);
-  as[max_ind] = as[3];
-  for (size_t i = 0; i < 3; ++i)
-    as[i] = fdm_vector_combine(1, as+i, -fdm_vector_dot(&u3, as+i), &u3);
-  max_norm = fdm_vector_norm_2(as);
-  max_ind = 0;
-  for (size_t i = 1; i < 3; ++i) {
-    float norm = fdm_vector_norm_2(as+i);
-    if (norm > max_norm) {
-      max_norm = norm;
-      max_ind = i;
-    }
+  size_t u3_i = fdm_pvt_longest_vector(vs, 4);
+  fdm_vector u3 = fdm_vector_normalize(vs + u3_i);
+  vs[u3_i] = vs[3];
+  for (size_t i = 0; i < 3; ++i) {
+    vs[i] = fdm_vector_combine(1, vs + i, -fdm_vector_dot(&u3, vs + i), &u3);
   }
-  fdm_vector u4 = fdm_vector_normalize(as+max_ind);
+  size_t u4_i = fdm_pvt_longest_vector(vs, 3);
+  fdm_vector u4 = fdm_vector_normalize(vs + u4_i);
+  bool orient = fdm_orientation(u1, u2, &u3, &u4);
+  if (orient) {
+    *out3 = u3;
+    *out4 = u4;
+  } else {
+    *out3 = u4;
+    *out4 = u3;
+  }
+}
+
+static inline fdm_affine fdm_create_rotate(float rad, fdm_vector const * vect1, fdm_vector const * vect2)
+{
+  fdm_vector u1, u2, u3, u4;
+  fdm_pvt_gram_schmidt_2(&u1, &u2, vect1, vect2);
+  fdm_pvt_extend_basis_2(&u3, &u4, &u1, &u2);
 
   fdm_affine basis_change = fdm_create_matrix
     (fdm_vector_x(&u1), fdm_vector_y(&u1), fdm_vector_z(&u1), fdm_vector_w(&u1),
@@ -180,13 +200,13 @@ static inline fdm_affine fdm_create_rotate(float rad, fdm_vector const * vect1, 
      sinf(rad), cos(rad), 0, 0,
      0, 0, 1, 0,
      0, 0, 0, 1);
-  fdm_affine basis_dischange = fdm_create_matrix
+  fdm_affine basis_unchange = fdm_create_matrix
     (fdm_vector_x(&u1), fdm_vector_x(&u2), fdm_vector_x(&u3), fdm_vector_x(&u4),
      fdm_vector_y(&u1), fdm_vector_y(&u2), fdm_vector_y(&u3), fdm_vector_y(&u4),
      fdm_vector_z(&u1), fdm_vector_z(&u2), fdm_vector_z(&u3), fdm_vector_z(&u4),
      fdm_vector_w(&u1), fdm_vector_w(&u2), fdm_vector_w(&u3), fdm_vector_w(&u4));
   fdm_affine result = fdm_affine_concat(&basis_change, &rotate);
-  result = fdm_affine_concat(&result, &basis_dischange);
+  result = fdm_affine_concat(&result, &basis_unchange);
   return result;
 }
 
